@@ -6,7 +6,7 @@ module.exports = {
     puppetHeads: {
       label: '偶头档案',
       defaultStatus: '可演出',
-      statuses: ['可演出', '待修补', '修补中', '试演中', '不可演出', '已装箱'],
+      statuses: ['可演出', '待修补', '修补中', '试演中', '不可演出', '已装箱', '外借', '隔离中'],
       required: ['role', 'play', 'paintStatus', 'mechanism', 'boxNo'],
       titleFields: ['role', 'play'],
       defaults: { currentUsable: true }
@@ -14,7 +14,7 @@ module.exports = {
     accessories: {
       label: '服装配件',
       defaultStatus: '在库',
-      statuses: ['在库', '已装箱', '缺损', '遗失'],
+      statuses: ['在库', '已装箱', '缺损', '遗失', '外借', '隔离中'],
       required: ['name', 'role', 'play', 'boxNo'],
       titleFields: ['name', 'role']
     },
@@ -38,6 +38,29 @@ module.exports = {
       statuses: ['待处理', '修复中', '已补齐', '确认为遗失'],
       required: ['tourBoxId', 'itemType', 'itemName', 'problem'],
       titleFields: ['itemName', 'problem']
+    },
+    materialBatches: {
+      label: '材料批次',
+      defaultStatus: '待检',
+      statuses: ['待检', '合格', '不合格', '已召回'],
+      required: ['batchNo', 'materialName', 'supplier'],
+      titleFields: ['batchNo', 'materialName']
+    },
+    recallNotices: {
+      label: '召回通知',
+      defaultStatus: '待处理',
+      statuses: ['待处理', '已隔离', '已归还', '复检中', '已闭环'],
+      required: ['noticeNo', 'batchNo', 'boxNo'],
+      titleFields: ['noticeNo', 'batchNo'],
+      defaults: { version: 1 }
+    },
+    isolationConclusions: {
+      label: '隔离结论',
+      defaultStatus: '有效',
+      statuses: ['有效', '已失效'],
+      required: ['noticeNo', 'batchNo'],
+      titleFields: ['noticeNo', 'batchNo'],
+      defaults: { version: 1 }
     }
   },
   seed: [
@@ -71,6 +94,9 @@ module.exports = {
   examples: [
     'GET /api/puppetHeads?play=火焰山&status=可演出 查询某剧目可用偶头',
     'POST /api/tourBoxes 创建巡演装箱单',
-    'POST /api/lossReports 登记返场缺损或遗失'
+    'POST /api/lossReports 登记返场缺损或遗失',
+    'POST /api/recallNotices 按批次创建召回通知并追溯隔离',
+    'POST /api/recallNotices/:noticeNo/confirmIsolation 保管员隔离确认（先到者占用）',
+    'GET /api/recallNotices/:noticeNo/conclusion 获取隔离结论（失效自动重算）'
   ]
 };
